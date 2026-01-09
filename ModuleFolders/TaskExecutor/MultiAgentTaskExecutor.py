@@ -193,7 +193,7 @@ class MultiAgentTaskExecutor(Base):
                     cache_project.db_atom_map = {}
             else:
                 # 2. 创建新项目
-                work_id = self.db_manager.create_project_work(
+                work_id = self.db_manager.create_project(
                     name=work_name,
                     src_lang=source_lang,
                     tgt_lang=target_lang,
@@ -218,7 +218,7 @@ class MultiAgentTaskExecutor(Base):
                     if file_path in cache_project.db_doc_map:
                         continue
                         
-                    doc_id = self.db_manager.create_source_doc(
+                    doc_id = self.db_manager.create_document(
                         work_id=work_id,
                         file_path=file_path,
                         doc_meta={"original_path": file_path}
