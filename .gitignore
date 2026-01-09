@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Virtual environments
+venv/
+.env/
+.venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.cursor/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+*.log
+*.tmp
+output/
+AiNieeOutput/
+
+# Large model files (DO NOT upload)
+Resource/Models/
+*.pth
+*.pt
+*.bin
+*.onnx
+*.safetensors
+*.npz
+*.msgpack
+

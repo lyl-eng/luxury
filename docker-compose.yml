@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  # PostgreSQL + pgvector (关系型数据库 + 向量插件)
+  postgres:
+    image: ankane/pgvector:latest
+    container_name: ainiee_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ainiee_db
+    ports:
+      - "5432:5432"
+    volumes:
+      # 数据持久化到 Docker Volume
+      - pg_data:/var/lib/postgresql/data
+
+  # ElasticSearch (全文检索引擎)
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.24
+    container_name: ainiee_elasticsearch
+    restart: always
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m" # 限制内存
+      - xpack.security.enabled=false     # 开发环境关闭鉴权，简化连接
+    ports:
+      - "9200:9200"
+    volumes:
+      # 数据持久化到 Docker Volume
+      - es_data:/usr/share/elasticsearch/data
+
+volumes:
+  pg_data:
+  es_data:
+
+
