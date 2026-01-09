@@ -607,6 +607,7 @@ class TranslationRefinementAgent(BaseAgent):
                                     "algorithm": "backtranslation"
                                 }
                                 self.db_manager.update_atom_examination(atom_id, examination)
+                                self.info(f"[DB] atom_id={atom_id} 质量评估已记录: score={score}/10, level={warning_level}")
                 except Exception as e:
                     self.error(f"[DB] 记录评估轨迹失败: {e}")
 
@@ -638,11 +639,18 @@ class TranslationRefinementAgent(BaseAgent):
                                 translated_text=translated_text,
                                 status_code=1  # 已初翻
                             )
+                            self.info(f"[DB] atom_id={atom_id} 初翻已保存: {translated_text[:30]}...")
             
             # 🔥 更新行数统计（每完成一个chunk就更新）
             self._update_line_stats(chunk_size)
             
             self.info(f"✓ 批次 {chunk_idx} 完整翻译流程完成: {chunk_size} 个单元")
+            
+            # [DB] 统计本批次数据库写入情况
+            if self.db_manager and self._current_cache_project:
+                db_written = sum(1 for item in chunk if self._get_atom_id(self._current_cache_project, file_path, item.row_index) is not None)
+                self.info(f"[DB] 批次 {chunk_idx} 数据库同步完成: {db_written}/{chunk_size} 个原子已写入")
+            
             self.info(f"{'='*60}\n")
         
             return {
@@ -1846,6 +1854,7 @@ class TranslationRefinementAgent(BaseAgent):
                                 translated_text=custom_translation,
                                 status_code=3  # 已人工审核
                             )
+                            self.info(f"[DB] atom_id={atom_id} 人工审核译文已保存")
                     
                 elif action == "retranslate":
                     # 需要LLM重新翻译
@@ -1876,6 +1885,7 @@ class TranslationRefinementAgent(BaseAgent):
                                     translated_text=new_translation,
                                     status_code=2  # 已润色
                                 )
+                                self.info(f"[DB] atom_id={atom_id} 重新翻译结果已保存")
                     else:
                         self.warning(f"      全局行{global_idx+1}: 重新翻译失败，保留原译文")
         else:
@@ -1935,6 +1945,7 @@ class TranslationRefinementAgent(BaseAgent):
                                 translated_text=new_text,
                                 status_code=4  # 已完成
                             )
+                            self.info(f"[DB] atom_id={atom_id} 一致性修正已保存: {new_text[:30]}...")
 
             chunk_data["translated_texts"] = checked_texts
         
